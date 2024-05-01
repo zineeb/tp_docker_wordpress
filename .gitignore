@@ -1,0 +1,31 @@
+# Fichiers de configuration de Docker contenant des secrets ou des variables d'environnement
+.env
+
+# Dossiers générés par Docker
+**/node_modules/
+**/vendor/
+**/wordpress/wp-content/uploads/
+**/wordpress/wp-content/upgrade/
+**/wordpress/wp-content/cache/
+**/wordpress/wp-content/backup-db/
+
+# Fichiers et dossiers génériques à ignorer
+.DS_Store
+Thumbs.db
+*.log
+*.sql
+*.tar.gz
+
+# Spécifique à l'utilisation de Docker Compose
+docker-compose.override.yml
+
+# Fichiers de données persistantes
+**/data/
+**/mysql_data/
+**/redis_data/
+**/wordpress_data/
+
+# Fichiers et répertoires de sauvegarde
+*.bak
+*.swp
+*.back

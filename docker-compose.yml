@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: bitnami/mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    networks:
+      - backend
+    volumes:
+      - mysql_data:/bitnami/mysql/data
+    restart: always
+
+  wordpress:
+    image: bitnami/wordpress:latest
+    depends_on:
+      - mysql
+      - redis
+    environment:
+      WORDPRESS_USERNAME: ${WORDPRESS_USERNAME}
+      WORDPRESS_PASSWORD: ${WORDPRESS_PASSWORD}
+      WORDPRESS_DATABASE_HOST: ${WORDPRESS_DATABASE_HOST}
+      WORDPRESS_DATABASE_PORT_NUMBER: ${WORDPRESS_DATABASE_PORT_NUMBER}
+      WORDPRESS_DATABASE_USER: ${WORDPRESS_DATABASE_USER}
+      WORDPRESS_DATABASE_PASSWORD: ${WORDPRESS_DATABASE_PASSWORD}
+      WORDPRESS_DATABASE_NAME: ${WORDPRESS_DATABASE_NAME}
+      ALLOW_EMPTY_PASSWORD: "no"
+      WORDPRESS_PLUGINS: redis-cache
+      WORDPRESS_EXTRA_WP_CONFIG_CONTENT: |
+        define('WP_CACHE', ${WP_CACHE});
+        define('WP_CACHE_KEY_SALT', '${WP_CACHE_KEY_SALT}');
+        define('WP_REDIS_HOST', '${WP_REDIS_HOST}');
+        define('WP_REDIS_PORT', ${WP_REDIS_PORT});
+        define('WP_REDIS_DATABASE', '${WP_REDIS_DATABASE}');
+    networks:
+      - backend
+      - frontend
+    volumes:
+      - wordpress_data:/bitnami/wordpress
+      - ./init-wp.sh:/init-wp.sh
+    command: >
+      /bin/bash -c "
+        /opt/bitnami/scripts/wordpress/entrypoint.sh /opt/bitnami/scripts/apache/run.sh &  
+        /init-wp.sh  
+      "
+    restart: always
+    deploy:
+      replicas: 2
+
+  redis:
+    image: bitnami/redis:latest
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+    networks:
+      - backend
+    volumes:
+      - redis_data:/bitnami/redis/data
+    restart: always
+
+  nginx:
+    image: bitnami/nginx:latest
+    volumes:
+      - ./nginx:/opt/bitnami/nginx/conf/server_blocks
+    ports:
+      - "80:8080"
+    depends_on:
+      - wordpress
+    networks:
+      - frontend
+    restart: always
+
+volumes:
+  mysql_data:
+  wordpress_data:
+  redis_data:
+
+networks:
+  backend:
+  frontend:
