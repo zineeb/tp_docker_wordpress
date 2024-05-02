@@ -67,6 +67,6 @@ Pour exécuter ce projet, vous aurez besoin de :
 
 5. **Accéder à WordPress**
 
-   Ouvrez un navigateur et visitez http://localhost ou l'adresse IP de votre serveur pour accéder à WordPress.
+   Patentiez quelques minutes et ouvrez un navigateur, ajoutez `wordpress` dans vos `HOSTS` puis visitez http://wordpress. 
 
 
